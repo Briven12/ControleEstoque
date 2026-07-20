@@ -6,6 +6,7 @@ import io.github.briven12.ControleEstoque.repository.EstoqueRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/produtos")
@@ -25,6 +26,11 @@ public class EstoqueController {
     @GetMapping
     public List<Estoque> findAll(){
         return estoqueRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Estoque> findById(@PathVariable Long id) {
+        return estoqueRepository.findById(id);
     }
 
     @PutMapping("{id}")
