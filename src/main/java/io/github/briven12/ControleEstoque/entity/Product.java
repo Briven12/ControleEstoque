@@ -1,4 +1,4 @@
-package io.github.briven12.ControleEstoque.model;
+package io.github.briven12.ControleEstoque.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 @Table(name ="product")
-public class Estoque {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

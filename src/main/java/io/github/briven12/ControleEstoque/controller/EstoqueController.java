@@ -1,8 +1,11 @@
 package io.github.briven12.ControleEstoque.controller;
 
 
-import io.github.briven12.ControleEstoque.model.Estoque;
+import io.github.briven12.ControleEstoque.DTO.ProductDTO;
+import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
+import io.github.briven12.ControleEstoque.entity.Product;
 import io.github.briven12.ControleEstoque.repository.EstoqueRepository;
+import io.github.briven12.ControleEstoque.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,41 +14,51 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/produtos")
 public class EstoqueController {
-    private EstoqueRepository estoqueRepository;
 
-    public EstoqueController(EstoqueRepository estoqueRepository) {
+    private final EstoqueRepository estoqueRepository;
+    private final ProductService productService;
+
+    public EstoqueController(
+            EstoqueRepository estoqueRepository,
+            ProductService productService) {
+
         this.estoqueRepository = estoqueRepository;
+        this.productService = productService;
     }
 
     @PostMapping
-    public Estoque save(@RequestBody Estoque estoque){
-        System.out.println("Produto Recebido: " + estoque);
-        return estoqueRepository.save(estoque);
+    public Product save(@RequestBody ProductDTO dto) {
+        System.out.println("Produto Recebido: " + dto.toString());
+        return productService.salvar(dto);
     }
 
     @GetMapping
-    public List<Estoque> findAll(){
+    public List<Product> findAll() {
         return estoqueRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<Estoque> findById(@PathVariable Long id) {
+    public Optional<Product> findById(@PathVariable Long id) {
         return estoqueRepository.findById(id);
     }
 
-    @PutMapping("{id}")
-    public void atualizar(@PathVariable Long id, @RequestBody Estoque estoque){
-        estoque.setId(id);
-        estoqueRepository.save(estoque);
-    }
-
-    @DeleteMapping("{id}")
-    public void deletar(@PathVariable Long id){
-        estoqueRepository.deleteById(id);
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable Long id) {
+        productService.apagarProduto(id);
     }
 
     @GetMapping("/buscar")
-    public List<Estoque> findByNameContaining(@RequestParam String name) {
+    public List<Product> findByNameContaining(
+            @RequestParam String name) {
+
         return estoqueRepository.findByNameContaining(name);
+    }
+
+    @PutMapping("/{id}/retirar-estoque")
+    public Product retirarEstoque(
+            @PathVariable Long id,
+            @RequestBody RetirarEstoqueDTO dtoqtd) {
+
+        return productService.retirarEstoque(id, dtoqtd);
     }
 }

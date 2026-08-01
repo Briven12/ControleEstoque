@@ -1,11 +1,11 @@
 package io.github.briven12.ControleEstoque.repository;
 
-import io.github.briven12.ControleEstoque.model.Estoque;
+import io.github.briven12.ControleEstoque.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface EstoqueRepository extends JpaRepository<Estoque,Long> {
+public interface EstoqueRepository extends JpaRepository<Product,Long> {
 
-    List<Estoque> findByNameContaining(String name);
+    List<Product> findByNameContaining(String name);
 }
