@@ -1,10 +1,11 @@
 package io.github.briven12.ControleEstoque.controller;
 
 
+import io.github.briven12.ControleEstoque.DTO.EntradaDTO;
 import io.github.briven12.ControleEstoque.DTO.ProductDTO;
 import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
 import io.github.briven12.ControleEstoque.entity.Product;
-import io.github.briven12.ControleEstoque.repository.EstoqueRepository;
+import io.github.briven12.ControleEstoque.repository.ProductRepository;
 import io.github.briven12.ControleEstoque.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,16 +14,16 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/produtos")
-public class EstoqueController {
+public class ProductController {
 
-    private final EstoqueRepository estoqueRepository;
+    private final ProductRepository productRepository;
     private final ProductService productService;
 
-    public EstoqueController(
-            EstoqueRepository estoqueRepository,
+    public ProductController(
+            ProductRepository productRepository,
             ProductService productService) {
 
-        this.estoqueRepository = estoqueRepository;
+        this.productRepository = productRepository;
         this.productService = productService;
     }
 
@@ -34,12 +35,12 @@ public class EstoqueController {
 
     @GetMapping
     public List<Product> findAll() {
-        return estoqueRepository.findAll();
+        return productRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public Optional<Product> findById(@PathVariable Long id) {
-        return estoqueRepository.findById(id);
+        return productRepository.findById(id);
     }
 
     @DeleteMapping("/{id}")
@@ -51,7 +52,7 @@ public class EstoqueController {
     public List<Product> findByNameContaining(
             @RequestParam String name) {
 
-        return estoqueRepository.findByNameContaining(name);
+        return productRepository.findByNameContaining(name);
     }
 
     @PutMapping("/{id}/retirar-estoque")
@@ -61,4 +62,12 @@ public class EstoqueController {
 
         return productService.retirarEstoque(id, dtoqtd);
     }
+
+    @PutMapping("/{id}/adcionar-estoque")
+    public Product adcionarEstoque(
+            @PathVariable Long id,
+            @RequestBody EntradaDTO dtoqtd) {
+        return productService.entradaEstoque(id,dtoqtd);
+    }
+
 }
