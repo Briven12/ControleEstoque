@@ -4,6 +4,7 @@ import io.github.briven12.ControleEstoque.DTO.EntradaDTO;
 import io.github.briven12.ControleEstoque.DTO.ProductDTO;
 import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
 import io.github.briven12.ControleEstoque.config.exception.InsufficientStockException;
+import io.github.briven12.ControleEstoque.config.exception.StockMovementException;
 import io.github.briven12.ControleEstoque.entity.Product;
 import io.github.briven12.ControleEstoque.entity.Stock_Movement;
 import io.github.briven12.ControleEstoque.enums.MovementReason;
@@ -126,7 +127,7 @@ public class ProductService {
     public void verificarEstoque(Product product,RetirarEstoqueDTO dtoqtd) {
 
         if (dtoqtd.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
+            throw new StockMovementException();
         }
 
         if (product.getQuantity() < dtoqtd.getQuantity()) {
