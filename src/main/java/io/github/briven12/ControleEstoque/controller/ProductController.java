@@ -70,4 +70,12 @@ public class ProductController {
         return productService.entradaEstoque(id,dtoqtd);
     }
 
+    @PutMapping("/{id}/ajuste-estoque")
+    public Product ajusteEstoque(
+            @PathVariable Long id,
+            @RequestBody EntradaDTO dtoqtd
+    ) {
+        return productService.ajusteEstoque(id,dtoqtd);
+    }
+
 }
