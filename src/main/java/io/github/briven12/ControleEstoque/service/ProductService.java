@@ -1,6 +1,7 @@
 package io.github.briven12.ControleEstoque.service;
 
 import io.github.briven12.ControleEstoque.DTO.EntradaDTO;
+import io.github.briven12.ControleEstoque.DTO.HistoricoProdutoDTO;
 import io.github.briven12.ControleEstoque.DTO.ProductDTO;
 import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
 import io.github.briven12.ControleEstoque.config.exception.InsufficientStockException;
@@ -13,6 +14,9 @@ import io.github.briven12.ControleEstoque.repository.ProductRepository;
 import io.github.briven12.ControleEstoque.repository.StockMovementRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ProductService {
@@ -135,4 +139,25 @@ public class ProductService {
         }
 
     }
+
+    public List<HistoricoProdutoDTO> historicoProduto(Long id){
+        List<Stock_Movement> movimentacoes = stockMovementRepository.findByProductId(id);
+
+        List<HistoricoProdutoDTO> historico = new ArrayList<>();
+
+        for (Stock_Movement movimento : movimentacoes) {
+            HistoricoProdutoDTO dto = new HistoricoProdutoDTO();
+
+            dto.setName(movimento.getProduct().getName());
+            dto.setQuantity(movimento.getQuantity());
+            dto.setType(movimento.getType());
+            dto.setReason(movimento.getReason());
+            dto.setMovement_date(movimento.getMovement_date());
+
+            historico.add(dto);
+        }
+
+        return historico;
+    }
+
 }

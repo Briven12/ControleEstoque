@@ -2,6 +2,7 @@ package io.github.briven12.ControleEstoque.controller;
 
 
 import io.github.briven12.ControleEstoque.DTO.EntradaDTO;
+import io.github.briven12.ControleEstoque.DTO.HistoricoProdutoDTO;
 import io.github.briven12.ControleEstoque.DTO.ProductDTO;
 import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
 import io.github.briven12.ControleEstoque.entity.Product;
@@ -29,7 +30,6 @@ public class ProductController {
 
     @PostMapping
     public Product save(@RequestBody ProductDTO dto) {
-        System.out.println("Produto Recebido: " + dto.toString());
         return productService.salvar(dto);
     }
 
@@ -76,6 +76,12 @@ public class ProductController {
             @RequestBody EntradaDTO dtoqtd
     ) {
         return productService.ajusteEstoque(id,dtoqtd);
+    }
+
+    @GetMapping("/{id}/historico-produto")
+    public List<HistoricoProdutoDTO> historicoProduto(
+            @PathVariable Long id){
+        return productService.historicoProduto(id);
     }
 
 }
