@@ -1,7 +1,7 @@
 package io.github.briven12.ControleEstoque.controller;
 
-import io.github.briven12.ControleEstoque.config.exception.InsufficientStockException;
-import io.github.briven12.ControleEstoque.config.exception.StockMovementException;
+import io.github.briven12.ControleEstoque.exception.InsufficientStockException;
+import io.github.briven12.ControleEstoque.exception.StockMovementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;

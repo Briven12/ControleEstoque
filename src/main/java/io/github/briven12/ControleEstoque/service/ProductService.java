@@ -4,8 +4,8 @@ import io.github.briven12.ControleEstoque.DTO.EntradaDTO;
 import io.github.briven12.ControleEstoque.DTO.HistoricoProdutoDTO;
 import io.github.briven12.ControleEstoque.DTO.ProductDTO;
 import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
-import io.github.briven12.ControleEstoque.config.exception.InsufficientStockException;
-import io.github.briven12.ControleEstoque.config.exception.StockMovementException;
+import io.github.briven12.ControleEstoque.exception.InsufficientStockException;
+import io.github.briven12.ControleEstoque.exception.StockMovementException;
 import io.github.briven12.ControleEstoque.entity.Product;
 import io.github.briven12.ControleEstoque.entity.Stock_Movement;
 import io.github.briven12.ControleEstoque.enums.MovementReason;
@@ -13,6 +13,8 @@ import io.github.briven12.ControleEstoque.enums.MovementType;
 import io.github.briven12.ControleEstoque.repository.ProductRepository;
 import io.github.briven12.ControleEstoque.repository.StockMovementRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,31 +56,37 @@ public class ProductService {
     }
 
     @Transactional
-    public Product salvar(ProductDTO dto) {
+    public List<ProductDTO> salvar(List<ProductDTO> produtosDto) {
+        List<ProductDTO> salvosDto = new ArrayList<>();
 
-        Product product = new Product();
+        for (ProductDTO dto : produtosDto) {
+            Product product = new Product();
+            product.setName(dto.getName());
+            product.setQuantity(dto.getQuantity());
+            product.setPrice(dto.getPrice());
+            product.setDescription(dto.getDescription());
 
-        product.setName(dto.getName());
-        product.setQuantity(dto.getQuantity());
-        product.setPrice(dto.getPrice());
-        product.setDescription(dto.getDescription());
-        Product produtoSalvo = productRepository.save(product);
+            Product produtoSalvo = productRepository.save(product);
 
-        Stock_Movement  sm = new Stock_Movement();
-        sm.setProduct(produtoSalvo);
-        sm.setQuantity(dto.getQuantity());
-        sm.setType(MovementType.ENTRADA);
-        sm.setReason(MovementReason.COMPRA);
+            Stock_Movement sm = new Stock_Movement();
+            sm.setProduct(produtoSalvo);
+            sm.setQuantity(dto.getQuantity());
+            sm.setType(MovementType.ENTRADA);
+            sm.setReason(MovementReason.COMPRA);
 
-        stockMovementRepository.save(sm);
+            stockMovementRepository.save(sm);
 
-        return produtoSalvo;
+            // Mapeia a entidade salva de volta para DTO (incluindo ID gerado)
+            salvosDto.add(new ProductDTO(produtoSalvo));
+        }
+
+        return salvosDto;
     }
 
     @Transactional
     public void apagarProduto(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
-        Stock_Movement  sm = new Stock_Movement();
+        Stock_Movement sm = new Stock_Movement();
         sm.setProduct(product);
         sm.setQuantity(product.getQuantity());
         sm.setType(MovementType.SAIDA);
@@ -89,7 +97,7 @@ public class ProductService {
 
     @Transactional
     public Product entradaEstoque(Long id, EntradaDTO dto) {
-        Product product =  productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
 
         if (dto.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser maior que 0");
@@ -111,7 +119,7 @@ public class ProductService {
 
 
     public Product ajusteEstoque(Long id, EntradaDTO dto) {
-        Product product =  productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto nao encontrado"));
 
         if (dto.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser maior que 0");
@@ -128,7 +136,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void verificarEstoque(Product product,RetirarEstoqueDTO dtoqtd) {
+    public void verificarEstoque(Product product, RetirarEstoqueDTO dtoqtd) {
 
         if (dtoqtd.getQuantity() <= 0) {
             throw new StockMovementException();
@@ -140,7 +148,7 @@ public class ProductService {
 
     }
 
-    public List<HistoricoProdutoDTO> historicoProduto(Long id){
+    public List<HistoricoProdutoDTO> historicoProduto(Long id) {
         List<Stock_Movement> movimentacoes = stockMovementRepository.findByProductId(id);
 
         List<HistoricoProdutoDTO> historico = new ArrayList<>();
@@ -158,6 +166,21 @@ public class ProductService {
         }
 
         return historico;
+    }
+
+    private ProductDTO entityParaProductDTO(Product product) {
+        return new ProductDTO(
+                product.getName(),
+                product.getQuantity(),
+                product.getPrice(),
+                product.getDescription()
+        );
+    }
+
+
+    public Page<ProductDTO> listarProdutos(Pageable pag) {
+        Page<Product> paginaProdutos = productRepository.findAll(pag);
+        return paginaProdutos.map(this::entityParaProductDTO);
     }
 
 }

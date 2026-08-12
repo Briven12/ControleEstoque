@@ -8,6 +8,12 @@ import io.github.briven12.ControleEstoque.DTO.RetirarEstoqueDTO;
 import io.github.briven12.ControleEstoque.entity.Product;
 import io.github.briven12.ControleEstoque.repository.ProductRepository;
 import io.github.briven12.ControleEstoque.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +33,10 @@ public class ProductController {
         this.productRepository = productRepository;
         this.productService = productService;
     }
-
     @PostMapping
-    public Product save(@RequestBody ProductDTO dto) {
-        return productService.salvar(dto);
+    public ResponseEntity<List<ProductDTO>> save(@RequestBody List<ProductDTO> dtos) {
+        List<ProductDTO> salvos = productService.salvar(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(salvos);
     }
 
     @GetMapping
@@ -83,5 +89,16 @@ public class ProductController {
             @PathVariable Long id){
         return productService.historicoProduto(id);
     }
+
+    @GetMapping("/listaProdutos")
+    public ResponseEntity<Page<ProductDTO>> listarProdutos(
+            @PageableDefault(page = 0,size = 10,sort = "name", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+
+        Page<ProductDTO> paginaDeProdutos = productService.listarProdutos(pageable);
+
+        return ResponseEntity.ok(paginaDeProdutos);
+    }
+
 
 }

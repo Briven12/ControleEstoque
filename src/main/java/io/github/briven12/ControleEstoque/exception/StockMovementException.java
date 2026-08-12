@@ -1,4 +1,4 @@
-package io.github.briven12.ControleEstoque.config.exception;
+package io.github.briven12.ControleEstoque.exception;
 
 public class StockMovementException extends RuntimeException {
     public StockMovementException() {
